@@ -1,25 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect, useState} from 'react';
+import './App.scss'
+import User from "./components/User";
+import AddUser from "./components/AddUser";
+import Modal from "./components/Modal";
+import store from "./state/store";
+import {observer} from "mobx-react-lite";
+import Pagination from "./components/Pagination";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = observer(() => {
+    const [isOpenModal, setIsOpenModal] = useState(false)
+
+    useEffect(  () => {
+        store.fetchData()
+    },[])
+
+    const openModal = (user) => {
+        store.openModal = user
+        setIsOpenModal(prev => !prev)
+    }
+
+    const closeModal = () => {
+        setIsOpenModal(false)
+    }
+
+    return (
+        <div className={'container'}>
+            <div className="users-wrapper">
+                {
+                    store.users.map(user => <User key={user.id}
+                                                  user={user}
+                                                  openModal={openModal}/>)
+                }
+            </div>
+            <AddUser/>
+            <Pagination/>
+            {
+                isOpenModal && <Modal closeModal={closeModal}/>
+            }
+        </div>
+    );
+})
 
 export default App;
